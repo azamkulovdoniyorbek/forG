@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bir daqiqa...</title>
+<!-- Otiluvchi konfetti effekti kutubxonasi -->
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;1,500&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  body {
+    min-height: 100vh;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(circle at 20% 20%, #ffe4ec 0%, transparent 40%),
+                radial-gradient(circle at 80% 80%, #f3e8ff 0%, transparent 40%),
+                linear-gradient(135deg, #fff5f7 0%, #fbeef2 50%, #f7f0f5 100%);
+    color: #382933;
+    font-family: "Plus Jakarta Sans", sans-serif;
+  }
+
+  /* Orqa fondagi suzuvchi zarrachalar */
+  .floating-container {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .particle {
+    position: absolute;
+    bottom: -20px;
+    font-size: 14px;
+    opacity: 0.5;
+    animation: floatUp 8s infinite linear;
+  }
+  @keyframes floatUp {
+    0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+    20% { opacity: 0.6; }
+    80% { opacity: 0.6; }
+    100% { transform: translateY(-105vh) rotate(360deg); opacity: 0; }
+  }
+
+  /* Premium Karta Dizayni */
+  .card {
+    position: relative;
+    z-index: 10;
+    width: min(90vw, 460px);
+    min-height: 500px;
+    padding: 45px 35px 35px;
+    border: 1px solid rgba(255, 255, 255, 0.85);
+    border-radius: 36px;
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    box-shadow: 0 20px 50px rgba(180, 100, 130, 0.15),
+                inset 0 0 25px rgba(255, 255, 255, 0.6);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    overflow: hidden;
+    animation: cardGlow 4s infinite alternate ease-in-out;
+  }
+
+  @keyframes cardGlow {
+    0% { box-shadow: 0 20px 50px rgba(180, 100, 130, 0.15); }
+    100% { box-shadow: 0 25px 60px rgba(200, 90, 130, 0.25); }
+  }
+
+  .eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: #c07a90;
+    margin-bottom: 18px;
+    font-weight: 600;
+  }
+
+  h1 {
+    font-family: "Playfair Display", serif;
+    font-size: clamp(28px, 6vw, 38px);
+    font-weight: 600;
+    line-height: 1.25;
+    margin-bottom: 18px;
+    color: #2c1d27;
+  }
+  h1 span {
+    font-style: italic;
+    color: #b84c73;
+  }
+
+  p {
+    font-size: 15px;
+    line-height: 1.7;
+    color: #63525c;
+    margin-bottom: 28px;
+    font-weight: 400;
+  }
+
+  /* Tugmalar */
+  .buttons {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    width: 100%;
+    min-height: 60px;
+  }
+
+  button {
+    border: 0;
+    font: 600 14px "Plus Jakarta Sans", sans-serif;
+    cursor: pointer;
+    border-radius: 999px;
+    padding: 14px 28px;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.3s ease, box-shadow 0.3s ease;
+    outline: none;
+  }
+
+  #yes {
+    background: linear-gradient(135deg, #c95b83, #a83d65);
+    color: white;
+    box-shadow: 0 8px 20px rgba(185, 79, 120, 0.28);
+  }
+  #yes:hover {
+    transform: translateY(-2px) scale(1.04);
+    box-shadow: 0 12px 25px rgba(185, 79, 120, 0.38);
+  }
+
+  #no {
+    background: rgba(235, 215, 222, 0.7);
+    color: #825b68;
+  }
+
+  /* Sahifalar animatsiyasi */
+  .screen {
+    display: none;
+    width: 100%;
+    animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  .screen.active {
+    display: block;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(15px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  /* Indikatorlar */
+  .dots {
+    display: flex;
+    gap: 6px;
+    margin-top: 32px;
+    justify-content: center;
+  }
+  .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #e2d2d8;
+    transition: 0.4s ease;
+  }
+  .dot.active {
+    width: 22px;
+    border-radius: 10px;
+    background: #b84c73;
+  }
+
+  .choco-box {
+    font-size: 58px;
+    margin-bottom: 20px;
+    display: inline-block;
+    animation: pulse 1.8s infinite ease-in-out;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+  }
+
+  .final-title {
+    font-family: "Playfair Display", serif;
+    font-size: 38px;
+    font-weight: 600;
+    color: #b84c73;
+    margin-bottom: 12px;
+  }
+
+  .final-text {
+    font-size: 17px;
+    line-height: 1.6;
+    color: #4a3843;
+    font-weight: 500;
+  }
+
+  @media(max-width: 480px){
+    .card { padding: 35px 22px 28px; }
+    h1 { font-size: 28px; }
+    .final-title { font-size: 32px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="floating-container" id="particleContainer"></div>
+
+<main class="card">
+  
+  <!-- 1-Sahifa -->
+  <section class="screen active" id="s1">
+    <div class="eyebrow">bir daqiqa</div>
+    <h1>Gaplashib <span>olamizmi?</span></h1>
+    <p>Oxirgi gaplarim bilan seni xafa qilib qo‘yganimni bilaman. Shuni shunchaki o‘tib ketgandek qoldirgim kelmadi.</p>
+    <div class="buttons">
+      <button id="yes" onclick="next()">Ha, gaplashamiz</button>
+      <button id="no" onclick="nope()">Yo‘q</button>
+    </div>
+    <div class="dots"><i class="dot active"></i><i class="dot"></i><i class="dot"></i></div>
+  </section>
+
+  <!-- 2-Sahifa -->
+  <section class="screen" id="s2">
+    <div class="eyebrow">rostini aytsam</div>
+    <h1>Xafa qilishni <span>istamagandim</span></h1>
+    <p>To‘g‘risi, ba'zi joylarda boshqacharoq bo‘lishim kerak edi. Yana yaxshi gaplashib olsak, men xursand bo‘lardim.</p>
+    <div class="buttons">
+      <button id="yes" onclick="next()">Mayli :)</button>
+      <button id="no" onclick="nope()">Hali yo‘q</button>
+    </div>
+    <div class="dots"><i class="dot"></i><i class="dot active"></i><i class="dot"></i></div>
+  </section>
+
+  <!-- 3-Sahifa -->
+  <section class="screen" id="s3">
+    <div class="choco-box">🍫</div>
+    <div class="eyebrow">yana bir narsa</div>
+    <h1>Kichkina <span>sovg‘a</span> bor...</h1>
+    <p>Yarashsak, shunchaki kichkina shokolad ham bor. Qolgani esa o‘zingga bog‘liq :)</p>
+    <div class="buttons">
+      <button id="yes" onclick="finish()">Yarashdik 🤍</button>
+      <button id="no" onclick="nope()">Yo‘q</button>
+    </div>
+    <div class="dots"><i class="dot"></i><i class="dot"></i><i class="dot active"></i></div>
+  </section>
+
+  <!-- 4-Sahifa (Oxirgi sahifa) -->
+  <section class="screen" id="s4">
+    <div class="choco-box" style="font-size: 72px;">🍫✨</div>
+    <div class="final-title">Ajoyib!</div>
+    <p class="final-text">
+      Yakshanba kuni ko'rishamiz :)
+    </p>
+  </section>
+
+</main>
+
+<script>
+let step = 1, noCount = 0;
+
+function createParticles() {
+  const container = document.getElementById('particleContainer');
+  const symbols = ['✨', '🤍', '✦', '🌸'];
+  for (let i = 0; i < 18; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+    p.style.left = Math.random() * 100 + 'vw';
+    p.style.animationDelay = Math.random() * 8 + 's';
+    p.style.fontSize = (Math.random() * 10 + 12) + 'px';
+    container.appendChild(p);
+  }
+}
+createParticles();
+
+function show(n){
+  document.querySelectorAll('.screen').forEach(x => x.classList.remove('active'));
+  
+  const currentScreen = document.getElementById('s' + n);
+  currentScreen.classList.add('active');
+  
+  const b = currentScreen.querySelector('#no');
+  const yes = currentScreen.querySelector('#yes');
+  if(b) {
+    b.style.position = 'static';
+    b.style.transform = 'scale(1)';
+  }
+  if(yes) {
+    yes.style.transform = 'scale(1)';
+  }
+
+  noCount = 0;
+}
+
+function next(){ step++; show(step); }
+
+function finish(){ 
+  show(4); 
+  triggerSuperConfetti(); 
+}
+
+function nope(){
+  noCount++;
+  const screen = document.querySelector('.screen.active');
+  const b = screen.querySelector('#no');
+  const yes = screen.querySelector('#yes');
+  if(!b) return;
+
+  const texts = ["Rostdan?", "Bir o‘ylab ko‘r :)", "Hali ham yo‘qmi?", "Mayli..."];
+  b.textContent = texts[Math.min(noCount - 1, texts.length - 1)];
+
+  b.style.transform = `scale(${Math.max(0.55, 1 - noCount * 0.12)})`;
+
+  const spots = [
+    {x: 45, y: -10}, {x: -45, y: 15}, {x: 35, y: 18}, {x: -25, y: -18}
+  ];
+  const p = spots[Math.min(noCount - 1, spots.length - 1)];
+  b.style.position = 'relative';
+  b.style.left = p.x + 'px';
+  b.style.top = p.y + 'px';
+
+  if(yes){
+    yes.style.transform = `scale(${1 + noCount * 0.08})`;
+  }
+}
+
+function triggerSuperConfetti() {
+  const duration = 2.8 * 1000;
+  const animationEnd = Date.now() + duration;
+
+  const interval = setInterval(function() {
+    const timeLeft = animationEnd - Date.now();
+
+    if (timeLeft <= 0) {
+      return clearInterval(interval);
+    }
+
+    const particleCount = 45 * (timeLeft / duration);
+    
+    confetti({ 
+      particleCount, 
+      spread: 100,
+      startVelocity: 45,
+      origin: { x: Math.random(), y: Math.random() - 0.2 },
+      colors: ['#b84c73', '#ffb3c6', '#ffffff', '#e295b5', '#ffd700']
+    });
+  }, 180);
+}
+</script>
+</body>
+</html>
